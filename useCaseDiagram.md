@@ -28,6 +28,8 @@ graph TB
         UC23["View Order History"]
         UC24["Cancel Order"]
         UC25["Return Product"]
+        UC32["Manage Wallet"]
+        UC33["View Product Recommendations"]
     end
     
     subgraph Admin_UC["Admin Use Cases"]
@@ -42,6 +44,7 @@ graph TB
     subgraph System_UC["System Use Cases"]
         UC12S["Process Payment"]
         UC13S["Place Order"]
+        UC34["Generate Invoice"]
     end
     
     Customer["👤 Customer"]
@@ -71,6 +74,8 @@ graph TB
     Customer -->|uses| UC23
     Customer -->|uses| UC24
     Customer -->|uses| UC25
+    Customer -->|uses| UC32
+    Customer -->|uses| UC33
     
     Admin -->|uses| UC26
     Admin -->|uses| UC27
@@ -81,6 +86,7 @@ graph TB
     
     System -->|executes| UC12S
     System -->|executes| UC13S
+    System -->|executes| UC34
     
     UC1 -.->|includes| UC3
     UC2 -.->|includes| UC3
@@ -103,6 +109,8 @@ graph TB
     UC27 -.->|includes| UC26
     UC29 -.->|includes| UC28
     UC31 -.->|includes| UC26
+    UC34 -.->|includes| UC13
+    UC33 -.->|extends| UC1
 ```
 
 ## Use Case Descriptions
@@ -271,6 +279,19 @@ graph TB
 - Admin creates, updates, or deactivates coupon codes
 - Sets discount amounts, expiry dates, and usage limits
 - Included in: Manage Products
+
+#### 32. **Manage Wallet (UC32)**
+- Customer views balance and transaction history
+- Can add funds or use balance for payments
+- Precondition: Logged in
+
+#### 33. **View Product Recommendations (UC33)**
+- System suggests products based on user behavior
+- Extends: Browse Products
+
+#### 34. **Generate Invoice (UC34)** [System]
+- System generates a PDF invoice after order placement
+- Included in: Place Order (System)
 
 ## Actor Definitions
 

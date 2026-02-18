@@ -14,6 +14,7 @@ classDiagram
         +login()
         +updateProfile()
         +logout()
+        +viewWallet()
     }
 
     class Address {
@@ -81,10 +82,9 @@ classDiagram
         -userId: int
         -addressId: int
         -paymentId: int
-        -totalAmount: decimal
-        -status: string
-        -createdAt: datetime
         -updatedAt: datetime
+        -couponCode: string
+        -invoiceId: string
         +placeOrder()
         +cancelOrder()
         +updateStatus()
@@ -169,6 +169,32 @@ classDiagram
         +deleteNotification()
     }
 
+    class Wallet {
+        -walletId: int
+        -userId: int
+        -balance: decimal
+        +addFunds()
+        +deductFunds()
+        +getBalance()
+    }
+
+    class Report {
+        -reportId: int
+        -type: string
+        -content: string
+        -generatedAt: datetime
+        +generate()
+        +export()
+    }
+
+    class Analytics {
+        -kpiId: int
+        -metricName: string
+        -value: float
+        +getStats()
+        +updateKPI()
+    }
+
     class Payment_Gateway {
         -gatewayId: int
         -providerName: string
@@ -185,6 +211,7 @@ classDiagram
     User "1" --> "*" Review : writes
     User "1" --> "*" Wishlist : creates
     User "1" --> "*" Notification : receives
+    User "1" --> "1" Wallet : has
 
     Cart "1" --> "*" CartItem : contains
     CartItem "*" --> "1" Product : references
@@ -210,6 +237,8 @@ classDiagram
     Admin "1" --> "*" Product : manages
     Admin "1" --> "*" Coupon : manages
     Admin "1" --> "*" Order : monitors
+    Admin "1" --> "*" Report : generates
+    Admin "1" --> "1" Analytics : views
 ```
 
 ## Class Descriptions
@@ -255,6 +284,15 @@ Administrative user with privileges to manage products, users, and orders.
 
 ### Notification
 System for sending order updates and promotional messages to users.
+
+### Wallet
+Digital wallet for users to store balance and make payments.
+
+### Report
+Structured data document generated for business analysis.
+
+### Analytics
+Real-time performance metrics and KPIs for the platform.
 
 ### Payment_Gateway
 Integration with external payment providers for secure transaction processing.

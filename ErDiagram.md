@@ -8,6 +8,7 @@ erDiagram
     USERS ||--o{ WISHLISTS : creates
     USERS ||--o{ NOTIFICATIONS : receives
     USERS ||--|| CART : owns
+    USERS ||--|| WALLET : has
 
     CART ||--o{ CART_ITEMS : contains
     CART_ITEMS }o--|| PRODUCTS : references
@@ -20,7 +21,9 @@ erDiagram
 
     ORDERS ||--o{ ORDER_ITEMS : contains
     ORDERS ||--|| PAYMENTS : has
+    ORDERS ||--|| INVOICES : generates
     ORDERS }o--|| ADDRESSES : ships_to
+    ORDERS }o--|| COUPONS : applies
 
     ORDER_ITEMS }o--|| PRODUCTS : contains
 
@@ -147,6 +150,21 @@ erDiagram
         int usage_limit
     }
 
+    WALLET {
+        int wallet_id PK
+        int user_id FK
+        decimal balance
+        datetime last_updated
+    }
+
+    INVOICES {
+        int invoice_id PK
+        int order_id FK
+        string invoice_number UK
+        datetime generated_at
+        string pdf_url
+    }
+
     NOTIFICATIONS {
         int notification_id PK
         int user_id FK
@@ -241,6 +259,19 @@ Discount codes and promotional offers.
 - **Primary Key**: coupon_id
 - **Unique Key**: code
 - **Attributes**: discount (percentage or fixed amount), expiry_date, usage_limit
+- **Relationships**: Applied to multiple orders
+
+### WALLET
+Stores user's digital currency balance for payments.
+- **Primary Key**: wallet_id
+- **Foreign Key**: user_id
+- **Attributes**: balance, last_updated
+
+### INVOICES
+Legally compliant billing document for orders.
+- **Primary Key**: invoice_id
+- **Foreign Key**: order_id
+- **Attributes**: invoice_number, generated_at, pdf_url
 
 ### NOTIFICATIONS
 System notifications for order updates and promotions.

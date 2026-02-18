@@ -19,6 +19,9 @@ sequenceDiagram
     deactivate Database
     Backend-->>Frontend: Registration successful
     deactivate Backend
+    Backend->>User: Send verification email
+    User->>Backend: Verify email (click link)
+    Backend-->>User: Email verified
     Frontend-->>User: Account created successfully
 
     User->>Frontend: Enter login credentials
@@ -143,6 +146,15 @@ sequenceDiagram
     deactivate Backend
     Frontend-->>User: Show payment options
 
+    User->>Frontend: Apply Coupon (enter code)
+    Frontend->>Backend: POST /coupon/apply (code, cart_total)
+    activate Backend
+    Backend->>Database: Validate coupon
+    Database-->>Backend: Coupon details
+    Backend-->>Frontend: Discount applied + New total
+    deactivate Backend
+    Frontend-->>User: Update order summary
+
     User->>Frontend: Select payment method
     Frontend->>Frontend: Enter payment details
     Frontend->>Backend: POST /payment/process (order_details, payment_method)
@@ -171,9 +183,11 @@ sequenceDiagram
     Database-->>Backend: Order confirmed
     Backend->>Database: Reduce product stock
     Database-->>Backend: Stock updated
-    Backend-->>Frontend: Order confirmation
+    Backend->>Backend: Generate Invoice
+    Backend->>Database: Store Invoice
+    Backend-->>Frontend: Order confirmation + Invoice
     deactivate Backend
-    Frontend-->>User: Show order confirmation with receipt
+    Frontend-->>User: Show order confirmation with receipt/invoice
 ```
 
 ## 5. Order Tracking Flow
@@ -260,7 +274,36 @@ sequenceDiagram
     Frontend-->>User: Show confirmation
 ```
 
-## 7. Wishlist Management Flow
+## 7. Product Return and Refund Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant Database
+
+    User->>Frontend: Initiate Return (order_id, reason)
+    Frontend->>Backend: POST /returns (order_id, items, reason)
+    activate Backend
+    Backend->>Database: Check return window/eligibility
+    Database-->>Backend: Eligible
+    Backend->>Database: Update order status (return_initiated)
+    Backend-->>Frontend: Return request accepted
+    deactivate Backend
+
+    Note right of Backend: After items are received/inspected
+
+    Admin->>Backend: Approve Refund (return_id)
+    activate Backend
+    Backend->>Database: Update order status (refunded)
+    Backend->>Database: Update Wallet balance (credit)
+    Backend->>Database: Update product stock (re-stock)
+    Backend-->>User: Refund confirmation
+    deactivate Backend
+```
+
+## 8. Wishlist Management Flow
 
 ```mermaid
 sequenceDiagram
@@ -349,6 +392,37 @@ sequenceDiagram
     Backend-->>Frontend: Stock updated
     deactivate Backend
     Frontend-->>Admin: Confirm update
+
+## 10. Admin Reports and Analytics Flow
+
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant Frontend
+    participant Backend
+    participant Database
+
+    Admin->>Frontend: Click "Generate Sales Report"
+    Frontend->>Backend: GET /admin/reports/sales?period=monthly
+    activate Backend
+    Backend->>Database: Aggregate sales data
+    Database-->>Backend: Statistics
+    Backend->>Backend: Format Report (PDF/CSV)
+    Backend-->>Frontend: Report URL
+    deactivate Backend
+    Frontend-->>Admin: Show Download Link
+
+    Admin->>Frontend: View Dashboard KPIs
+    Frontend->>Backend: GET /admin/analytics/kpis
+    activate Backend
+    Backend->>Database: Fetch latest analytics
+    Database-->>Backend: KPI metrics
+    Backend-->>Frontend: KPI JSON
+    deactivate Backend
+    Frontend-->>Admin: Render charts and graphs
+```
+
+## Key Interactions Summary
 ```
 
 ## Key Interactions Summary
